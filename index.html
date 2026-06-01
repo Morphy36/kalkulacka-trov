@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulačka trov právneho zastúpenia | Vyhláška 655/2004 Z. z.</title>
+    <meta name="description" content="Bezplatná online kalkulačka trov právneho zastúpenia podľa vyhlášky MS SR č. 655/2004 Z. z. Civilné aj trestné konanie.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --blue: #2563eb;
+            --blue-dark: #1d4ed8;
+            --blue-light: #eff6ff;
+            --blue-ring: rgba(37,99,235,.12);
+            --green: #16a34a;
+            --green-light: #f0fdf4;
+            --red: #dc2626;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-700: #334155;
+            --gray-900: #0f172a;
+            --radius: .875rem;
+            --radius-sm: .5rem;
+            --shadow: 0 4px 24px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.04);
+            --transition: .18s ease;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem 1rem 4rem;
+        }
+
+        /* ===== LAYOUT ===== */
+        .page {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .375rem;
+            background: var(--blue-light);
+            color: var(--blue);
+            font-size: .75rem;
+            font-weight: 600;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            padding: .3rem .75rem;
+            border-radius: 99px;
+            margin-bottom: 1rem;
+        }
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1.25;
+            color: var(--gray-900);
+            margin-bottom: .5rem;
+        }
+        .header p {
+            color: var(--gray-500);
+            font-size: .9rem;
+        }
+
+        /* ===== CARD ===== */
+        .card {
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+        .card-title .icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            background: var(--blue-light);
+            border-radius: .375rem;
+            display: grid;
+            place-items: center;
+            font-size: .875rem;
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            background: var(--gray-100);
+            border-radius: var(--radius-sm);
+            padding: .25rem;
+            gap: .25rem;
+            margin-bottom: 1.5rem;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: .6rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: calc(var(--radius-sm) - .125rem);
+            font-size: .875rem;
+            font-weight: 500;
+            color: var(--gray-500);
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: inherit;
+        }
+        .tab-btn.active {
+            background: #fff;
+            color: var(--gray-900);
+            box-shadow: 0 1px 3px rgba(0,0,0,.1);
+        }
+        .tab-btn:hover:not(.active) {
+            color: var(--gray-700);
+        }
+
+        /* ===== FORM ===== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group.full { grid-column: 1 / -1; }
+
+        label {
+            display: block;
+            font-size: .8125rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: .375rem;
+        }
+        .label-hint {
+            font-weight: 400;
+            color: var(--gray-400);
+            font-size: .75rem;
+            margin-left: .25rem;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: .6875rem .875rem;
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-size: .9375rem;
+            font-family: inherit;
+            color: var(--gray-900);
+            background: #fff;
+            transition: border-color var(--transition), box-shadow var(--transition);
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px var(--blue-ring);
+        }
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right .875rem center;
+            padding-right: 2.5rem;
+            cursor: pointer;
+        }
+
+        /* Checkbox */
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: .625rem;
+            padding: .75rem 1rem;
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: border-color var(--transition), background var(--transition);
+        }
+        .checkbox-wrapper:hover { border-color: var(--blue); background: var(--blue-light); }
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 1.125rem;
+            height: 1.125rem;
+            accent-color: var(--blue);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .checkbox-wrapper label {
+            margin: 0;
+            cursor: pointer;
+            font-size: .875rem;
+            font-weight: 400;
+            color: var(--gray-700);
+        }
+
+        /* ===== ACTIONS LIST ===== */
+        .acts-list {
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+            margin-bottom: 1rem;
+        }
+        .act-item {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .625rem .875rem;
+            background: var(--gray-50);
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-size: .875rem;
+        }
+        .act-item select {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 0;
+            font-size: .875rem;
+        }
+        .act-item select:focus { box-shadow: none; border: none; }
+        .btn-icon {
+            width: 1.75rem;
+            height: 1.75rem;
+            border: none;
+            background: var(--gray-200);
+            border-radius: .375rem;
+            cursor: pointer;
+            font-size: 1rem;
+            display: grid;
+            place-items: center;
+            transition: background var(--transition);
+            flex-shrink: 0;
+            font-family: inherit;
+        }
+        .btn-icon:hover { background: var(--gray-400); }
+        .btn-icon.danger:hover { background: #fecaca; color: var(--red); }
+        .btn-add-act {
+            display: flex;
+            align-items: center;
+            gap: .375rem;
+            padding: .5rem .75rem;
+            background: none;
+            border: 1.5px dashed var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-size: .8125rem;
+            color: var(--blue);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all var(--transition);
+            width: 100%;
+            justify-content: center;
+            font-weight: 500;
+        }
+        .btn-add-act:hover { background: var(--blue-light); border-color: var(--blue); }
+
+        /* ===== BUTTON ===== */
+        .btn-primary {
+            width: 100%;
+            padding: .875rem;
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background var(--transition), transform var(--transition);
+            margin-top: .25rem;
+            letter-spacing: .01em;
+        }
+        .btn-primary:hover { background: var(--blue-dark); }
+        .btn-primary:active { transform: scale(.98); }
+
+        .btn-secondary {
+            width: 100%;
+            padding: .75rem;
+            background: none;
+            color: var(--gray-500);
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-size: .875rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all var(--transition);
+        }
+        .btn-secondary:hover { border-color: var(--gray-400); color: var(--gray-700); }
+
+        /* ===== RESULT ===== */
+        .result-card {
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: none;
+        }
+        .result-card.visible { display: block; animation: slideUp .25s ease; }
+
+        .result-header {
+            background: linear-gradient(135deg, var(--blue) 0%, #3b82f6 100%);
+            padding: 1.5rem 2rem;
+            color: #fff;
+        }
+        .result-header h2 {
+            font-size: 1rem;
+            font-weight: 500;
+            opacity: .85;
+            margin-bottom: .25rem;
+        }
+        .result-total {
+            font-size: 2.25rem;
+            font-weight: 700;
+            letter-spacing: -.02em;
+        }
+
+        .result-body {
+            padding: 1.5rem 2rem;
+        }
+        .result-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: .625rem;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: .9rem;
+        }
+        .result-row .label { color: var(--gray-500); }
+        .result-row .value { font-weight: 500; color: var(--gray-900); font-variant-numeric: tabular-nums; }
+        .result-divider { height: 1px; background: var(--gray-200); margin: .75rem 0; }
+
+        .result-acts-detail {
+            margin-top: 1.25rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        .result-acts-detail summary {
+            font-size: .8125rem;
+            font-weight: 500;
+            color: var(--gray-500);
+            cursor: pointer;
+            user-select: none;
+        }
+        .result-acts-detail summary:hover { color: var(--blue); }
+        .acts-table {
+            margin-top: .75rem;
+            font-size: .8125rem;
+            width: 100%;
+        }
+        .acts-table th, .acts-table td {
+            text-align: left;
+            padding: .375rem .5rem;
+        }
+        .acts-table th { color: var(--gray-400); font-weight: 500; }
+        .acts-table tbody tr:nth-child(even) { background: var(--gray-50); }
+        .acts-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+        .result-note {
+            margin-top: 1rem;
+            padding: .75rem 1rem;
+            background: var(--gray-50);
+            border-radius: var(--radius-sm);
+            font-size: .78rem;
+            color: var(--gray-500);
+            border-left: 3px solid var(--gray-200);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: .75rem;
+            padding: 1rem 2rem 1.5rem;
+        }
+
+        /* ===== INFO BOX ===== */
+        .info-box {
+            display: flex;
+            gap: .75rem;
+            padding: .875rem 1rem;
+            background: var(--blue-light);
+            border-radius: var(--radius-sm);
+            font-size: .8125rem;
+            color: var(--gray-700);
+            margin-bottom: 1rem;
+        }
+        .info-box .info-icon { font-size: 1rem; flex-shrink: 0; margin-top: .05rem; }
+
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--gray-400);
+            font-size: .75rem;
+            line-height: 1.8;
+        }
+        footer a { color: var(--blue); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            body { padding: 1rem .75rem 3rem; }
+            .card { padding: 1.5rem; }
+            .header h1 { font-size: 1.4rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .result-total { font-size: 1.75rem; }
+            .btn-row { flex-direction: column; }
+            .result-header, .result-body { padding: 1.25rem 1.5rem; }
+        }
+
+        /* ===== PRINT ===== */
+        @media print {
+            body { background: #fff; padding: 0; }
+            .card, .result-card { box-shadow: none; border: 1px solid #ddd; }
+            .btn-primary, .btn-secondary, .btn-row { display: none !important; }
+            .result-card.visible { display: block !important; }
+            footer { display: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-badge">⚖️ Advokátske trovy</div>
+        <h1>Kalkulačka trov právneho zastúpenia</h1>
+        <p>Výpočet podľa vyhlášky MS SR č. 655/2004 Z. z.</p>
+    </header>
+
+    <!-- Main form card -->
+    <div class="card">
+        <div class="card-title">
+            <span class="icon">📋</span>
+            Parametre výpočtu
+        </div>
+
+        <!-- Tabs: Civilné / Trestné -->
+        <div class="tabs" role="tablist">
+            <button class="tab-btn active" role="tab" data-tab="civil" aria-selected="true">
+                Civilné konanie
+            </button>
+            <button class="tab-btn" role="tab" data-tab="criminal" aria-selected="false">
+                Trestné konanie
+            </button>
+        </div>
+
+        <form id="calc-form">
+
+            <!-- CIVILNÉ KONANIE -->
+            <div id="panel-civil" class="tab-panel">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="year">Rok výpočtu</label>
+                        <select id="year">
+                            <option value="2026" selected>2026</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="civil-type">Typ nároku</label>
+                        <select id="civil-type">
+                            <option value="monetary">Peňažné plnenie</option>
+                            <option value="non_monetary">Iné plnenie (základná sadzba)</option>
+                        </select>
+                    </div>
+                    <div class="form-group full" id="amount-group">
+                        <label for="amount">Hodnota sporu <span class="label-hint">(v eurách)</span></label>
+                        <input type="number" id="amount" min="0" step="0.01" placeholder="napr. 5000">
+                    </div>
+                </div>
+            </div>
+
+            <!-- TRESTNÉ KONANIE -->
+            <div id="panel-criminal" class="tab-panel" style="display:none">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="year-cr">Rok výpočtu</label>
+                        <select id="year-cr">
+                            <option value="2026" selected>2026</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="criminal-type">Trestná sadzba</label>
+                        <select id="criminal-type">
+                            <option value="criminal_5">Do 5 rokov (1/10 základu)</option>
+                            <option value="criminal_10">5 – 10 rokov (1/8 základu)</option>
+                            <option value="criminal_10_plus">Nad 10 rokov / výnimočný trest (1/6 základu)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Úkony — spoločné -->
+            <div class="form-group">
+                <label>Úkony právnej služby</label>
+                <div class="acts-list" id="acts-list">
+                    <div class="act-item">
+                        <select class="act-type-select">
+                            <option value="full">Celý úkon (1×)</option>
+                            <option value="half">Polovičný úkon (0,5×)</option>
+                            <option value="third">Tretinový úkon (1/3×)</option>
+                        </select>
+                        <button type="button" class="btn-icon danger remove-act" title="Odstrániť úkon">✕</button>
+                    </div>
+                </div>
+                <button type="button" class="btn-add-act" id="add-act-btn">
+                    ＋ Pridať úkon
+                </button>
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="vat">
+                    <label for="vat">Advokát je platcom DPH</label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary">Vypočítať trovy</button>
+        </form>
+    </div>
+
+    <!-- Result -->
+    <div class="result-card" id="result-card">
+        <div class="result-header">
+            <h2>Celkové trovy právneho zastúpenia</h2>
+            <div class="result-total" id="res-total">–</div>
+        </div>
+        <div class="result-body">
+            <div class="result-breakdown">
+                <div class="result-row">
+                    <span class="label">Tarifná odmena celkom</span>
+                    <span class="value" id="res-tariff">–</span>
+                </div>
+                <div class="result-row">
+                    <span class="label">Režijný paušál celkom</span>
+                    <span class="value" id="res-overhead">–</span>
+                </div>
+                <div class="result-row" id="res-vat-row" style="display:none">
+                    <span class="label" id="res-vat-label">DPH</span>
+                    <span class="value" id="res-vat">–</span>
+                </div>
+            </div>
+
+            <details class="result-acts-detail" id="acts-detail">
+                <summary>Zobraziť detail úkonov ▸</summary>
+                <table class="acts-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Typ úkonu</th>
+                            <th class="num">Odmena</th>
+                            <th class="num">Paušál</th>
+                        </tr>
+                    </thead>
+                    <tbody id="acts-tbody"></tbody>
+                </table>
+            </details>
+
+            <div class="result-note" id="res-note"></div>
+        </div>
+        <div class="btn-row">
+            <button class="btn-secondary" onclick="window.print()">🖨 Tlačiť</button>
+            <button class="btn-secondary" id="btn-copy">📋 Kopírovať súhrn</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>Výpočet je orientačný. Vždy sa poraďte s advokátom.</p>
+        <p>Vyhláška MS SR č. 655/2004 Z. z. o odmenách a náhradách advokátov</p>
+    </footer>
+</div>
+
+<script>
+/* ====================================================
+   KONFIGURÁCIA — sadzby podľa rokov
+   ==================================================== */
+// base    = civilný výpočtový základ (§ 11 ods. 3)
+// baseCr  = trestný výpočtový základ (§ 11 ods. 4) = priem. mes. mzda za H1 roka Y-3
+// DPH: 20 % do 31.12.2024, 23 % od 1.1.2025
+const CONFIG = {
+    2024: { overhead: 13.73, base: 1373, baseCr: 1163, vatRate: 0.20 },
+    2025: { overhead: 14.84, base: 1484, baseCr: 1252, vatRate: 0.23 },
+    2026: { overhead: 15.86, base: 1586, baseCr: 1373, vatRate: 0.23 }
+};
+
+// Koeficient pre prepočet € → Sk (§ 10 vyhlášky)
+const SK_TO_EUR = 30.1260;
+
+/* ====================================================
+   VÝPOČET TARIFNEJ ODMENY — peňažné plnenie (§ 10)
+   ==================================================== */
+function calcTariffMonetary(amountEur) {
+    const sk = amountEur * SK_TO_EUR;
+    let tariffSk;
+    if (sk <= 5000)        tariffSk = 500;
+    else if (sk <= 20000)  tariffSk = 500  + Math.ceil((sk -   5000) / 1000) * 50;
+    else if (sk <= 100000) tariffSk = 1250 + Math.ceil((sk -  20000) / 1000) * 60;
+    else if (sk <= 1000000)tariffSk = 6050 + Math.ceil((sk - 100000) / 1000) * 40;
+    else if (sk <= 10000000)tariffSk= 42050+ Math.ceil((sk -1000000) / 1000) * 20;
+    else                   tariffSk = 222050+Math.ceil((sk -10000000)/ 1000) * 10;
+    return tariffSk / SK_TO_EUR;
+}
+
+/* ====================================================
+   VÝPOČET ZÁKLADNEJ TARIFNEJ ODMENY ZA ÚKON
+   ==================================================== */
+function basePerAct(cfg, mode, civilType, amountEur) {
+    switch (mode) {
+        case 'civil':
+            if (civilType === 'monetary') return calcTariffMonetary(amountEur);
+            return cfg.base / 13;        // iné plnenie — 1/13 civilného základu
+        case 'criminal_5':    return cfg.baseCr / 10;   // do 5 rokov
+        case 'criminal_10':   return cfg.baseCr / 8;    // 5–10 rokov
+        case 'criminal_10_plus': return cfg.baseCr / 6; // nad 10 rokov / výnimočný trest
+        default: return cfg.base / 13;
+    }
+}
+
+/* ====================================================
+   DOM POMOCNÍKY
+   ==================================================== */
+const r2 = n => Math.round((n + Number.EPSILON) * 100) / 100;
+const fmt = n => n.toLocaleString('sk-SK', { style: 'currency', currency: 'EUR' });
+
+/* ====================================================
+   TABY
+   ==================================================== */
+let activeTab = 'civil';
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        activeTab = btn.dataset.tab;
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.toggle('active', b === btn);
+            b.setAttribute('aria-selected', b === btn);
+        });
+        document.getElementById('panel-civil').style.display  = activeTab === 'civil'    ? '' : 'none';
+        document.getElementById('panel-criminal').style.display = activeTab === 'criminal' ? '' : 'none';
+    });
+});
+
+/* ====================================================
+   AMOUNT INPUT — zobraziť len pri peňažnom plnení
+   ==================================================== */
+document.getElementById('civil-type').addEventListener('change', function () {
+    document.getElementById('amount-group').style.display = this.value === 'monetary' ? '' : 'none';
+});
+
+/* ====================================================
+   SPRÁVA ÚKONOV
+   ==================================================== */
+const actsList = document.getElementById('acts-list');
+
+function addActRow() {
+    const div = document.createElement('div');
+    div.className = 'act-item';
+    div.innerHTML = `
+        <select class="act-type-select">
+            <option value="full">Celý úkon (1×)</option>
+            <option value="half">Polovičný úkon (0,5×)</option>
+            <option value="third">Tretinový úkon (1/3×)</option>
+        </select>
+        <button type="button" class="btn-icon danger remove-act" title="Odstrániť úkon">✕</button>`;
+    actsList.appendChild(div);
+    updateRemoveButtons();
+}
+
+function updateRemoveButtons() {
+    const btns = actsList.querySelectorAll('.remove-act');
+    btns.forEach((btn, i) => {
+        btn.style.display = btns.length <= 1 ? 'none' : '';
+        btn.onclick = () => { btn.closest('.act-item').remove(); updateRemoveButtons(); };
+    });
+}
+
+document.getElementById('add-act-btn').addEventListener('click', addActRow);
+updateRemoveButtons();
+
+/* ====================================================
+   VÝPOČET
+   ==================================================== */
+document.getElementById('calc-form').addEventListener('submit', e => {
+    e.preventDefault();
+
+    const isCivil = activeTab === 'civil';
+    const yearKey  = isCivil ? document.getElementById('year').value
+                              : document.getElementById('year-cr').value;
+    const cfg = CONFIG[yearKey];
+
+    const civilType   = document.getElementById('civil-type').value;
+    const criminalType= document.getElementById('criminal-type').value;
+    const amountEur   = parseFloat(document.getElementById('amount').value) || 0;
+    const isVat       = document.getElementById('vat').checked;
+
+    // Zisti, aký mode platí
+    let mode;
+    if (isCivil) {
+        mode = civilType; // 'monetary' alebo 'non_monetary'
+    } else {
+        mode = criminalType; // 'criminal_5' | 'criminal_10' | 'criminal_10_plus'
+    }
+
+    // Koeficienty úkonov
+    const ACT_COEF = { full: 1, half: 0.5, third: 1/3 };
+    const ACT_NAME = { full: 'Celý úkon', half: 'Polovičný úkon', third: 'Tretinový úkon' };
+
+    const acts = Array.from(actsList.querySelectorAll('.act-type-select'))
+        .map(s => s.value);
+
+    const baseOdmena = r2(basePerAct(cfg, mode, civilType, amountEur));
+    let totalTariff = 0, totalOverhead = 0;
+    const rows = [];
+
+    acts.forEach((type, idx) => {
+        const coef    = ACT_COEF[type];
+        const odmena  = r2(baseOdmena * coef);
+        const pausal  = r2(cfg.overhead * coef);
+        totalTariff  += odmena;
+        totalOverhead += pausal;
+        rows.push({ idx: idx + 1, name: ACT_NAME[type], odmena, pausal });
+    });
+
+    let vatAmount = 0;
+    let total = r2(totalTariff + totalOverhead);
+    if (isVat) {
+        vatAmount = r2(total * cfg.vatRate);
+        total = r2(total + vatAmount);
+    }
+
+    // --- Render výsledku ---
+    document.getElementById('res-total').textContent = fmt(total);
+    document.getElementById('res-tariff').textContent = fmt(r2(totalTariff));
+    document.getElementById('res-overhead').textContent = fmt(r2(totalOverhead));
+
+    const vatRow = document.getElementById('res-vat-row');
+    if (isVat) {
+        vatRow.style.display = '';
+        document.getElementById('res-vat-label').textContent = `DPH (${Math.round(cfg.vatRate * 100)} %)`;
+        document.getElementById('res-vat').textContent = fmt(vatAmount);
+    } else {
+        vatRow.style.display = 'none';
+    }
+
+    // Detail úkonov
+    const tbody = document.getElementById('acts-tbody');
+    tbody.innerHTML = rows.map(r =>
+        `<tr><td>${r.idx}</td><td>${r.name}</td><td class="num">${fmt(r.odmena)}</td><td class="num">${fmt(r.pausal)}</td></tr>`
+    ).join('');
+
+    // Poznámka
+    const modeLabel = {
+        monetary: `peňažné plnenie ${fmt(amountEur)}`,
+        non_monetary: 'iné plnenie (základná sadzba 1/13)',
+        criminal_5: 'trestné konanie do 5 rokov (1/10 základu)',
+        criminal_10: 'trestné konanie 5–10 rokov (1/8 základu)',
+        criminal_10_plus: 'trestné konanie nad 10 rokov (1/6 základu)',
+    };
+    const usedBase = (mode.startsWith('criminal')) ? cfg.baseCr : cfg.base;
+    document.getElementById('res-note').textContent =
+        `Rok: ${yearKey} | Výpočtový základ: ${fmt(usedBase)} | Počet úkonov: ${acts.length} | Typ: ${modeLabel[mode]}`;
+
+    // Zobraziť kartu
+    const card = document.getElementById('result-card');
+    card.classList.add('visible');
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+/* ====================================================
+   KOPÍROVAŤ SÚHRN
+   ==================================================== */
+document.getElementById('btn-copy').addEventListener('click', function () {
+    const total    = document.getElementById('res-total').textContent;
+    const tariff   = document.getElementById('res-tariff').textContent;
+    const overhead = document.getElementById('res-overhead').textContent;
+    const note     = document.getElementById('res-note').textContent;
+    const vatRow   = document.getElementById('res-vat-row');
+    const vatLine  = vatRow.style.display !== 'none'
+        ? `\n${document.getElementById('res-vat-label').textContent}: ${document.getElementById('res-vat').textContent}`
+        : '';
+
+    const text = `Kalkulačka trov právneho zastúpenia\n${'='.repeat(40)}\n`
+        + `Tarifná odmena: ${tariff}\nRežijný paušál: ${overhead}${vatLine}\n${'─'.repeat(40)}\n`
+        + `SPOLU: ${total}\n\n${note}`;
+
+    navigator.clipboard.writeText(text).then(() => {
+        this.textContent = '✓ Skopírované';
+        setTimeout(() => { this.textContent = '📋 Kopírovať súhrn'; }, 2000);
+    });
+});
+</script>
+</body>
+</html>
