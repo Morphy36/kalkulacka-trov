@@ -437,6 +437,76 @@
             .result-header, .result-body { padding: 1.25rem 1.5rem; }
         }
 
+        /* ===== TČ REFERENČNÁ TABUĽKA ===== */
+        .tc-details summary {
+            font-size: .8125rem;
+            font-weight: 600;
+            color: var(--blue);
+            cursor: pointer;
+            user-select: none;
+            padding: .5rem 0;
+            list-style: none;
+        }
+        .tc-details summary::-webkit-details-marker { display: none; }
+        .tc-details summary::before { content: '▶ '; font-size: .75rem; }
+        .tc-details[open] summary::before { content: '▼ '; }
+        .tc-details summary:hover { opacity: .8; }
+
+        .tc-table-wrap {
+            margin-top: .75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .tc-note {
+            font-size: .75rem;
+            color: var(--gray-500);
+            background: var(--gray-50);
+            border-left: 3px solid var(--gray-200);
+            padding: .5rem .75rem;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+        .tc-group { }
+        .tc-group-title {
+            font-size: .75rem;
+            font-weight: 700;
+            padding: .35rem .75rem;
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+            letter-spacing: .02em;
+            text-transform: uppercase;
+        }
+        .tc-badge-12 { background: #dbeafe; color: #1e40af; }
+        .tc-badge-8  { background: #fef9c3; color: #854d0e; }
+        .tc-badge-6  { background: #fee2e2; color: #991b1b; }
+        .tc-badge-24 { background: #f0fdf4; color: #166534; }
+
+        .tc-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .775rem;
+        }
+        .tc-table th {
+            background: var(--gray-100);
+            color: var(--gray-500);
+            font-weight: 600;
+            text-align: left;
+            padding: .3rem .5rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .tc-table td {
+            padding: .3rem .5rem;
+            border-bottom: 1px solid var(--gray-100);
+            color: var(--gray-700);
+            vertical-align: top;
+        }
+        .tc-table td:first-child {
+            white-space: nowrap;
+            color: var(--blue);
+            font-weight: 500;
+            width: 4.5rem;
+        }
+        .tc-table tbody tr:hover { background: var(--gray-50); }
+
         /* ===== PRINT ===== */
         @media print {
             body { background: #fff; padding: 0; }
@@ -515,12 +585,109 @@
                     <div class="form-group">
                         <label for="criminal-type">Trestná sadzba</label>
                         <select id="criminal-type">
-                            <option value="criminal_5">Do 5 rokov (1/10 základu)</option>
-                            <option value="criminal_10">5 – 10 rokov (1/8 základu)</option>
+                            <option value="criminal_5">Horná hranica do 5 rokov (1/12 základu)</option>
+                            <option value="criminal_10">Horná hranica 5–10 rokov (1/8 základu)</option>
                             <option value="criminal_10_plus">Nad 10 rokov / výnimočný trest (1/6 základu)</option>
+                            <option value="criminal_neverejne">Neverejné zasadnutie – § 12 ods. 1 (1/24 základu)</option>
+                            <option value="criminal_priestupky">Konanie o priestupkoch (1/24 základu)</option>
                         </select>
                     </div>
                 </div>
+            </div>
+
+            <!-- REFERENČNÁ TABUĽKA TRESTNÝCH ČINOV -->
+            <div id="tc-reference" style="display:none" class="form-group">
+                <details class="tc-details">
+                    <summary>📖 Prehľad trestných sadzieb – pomoc pri zaradení</summary>
+                    <div class="tc-table-wrap">
+                        <p class="tc-note">Tabuľka zobrazuje hornú hranicu trestnej sadzby podľa <strong>základnej skutkovej podstaty (ods. 1)</strong>. Pre kvalifikované skutky môže byť sadzba vyššia. § 12 ods. 4 Trestného zákona: na zákonné zníženie sadzby u mladistvých sa neprihliada.</p>
+
+                        <div class="tc-group">
+                            <div class="tc-group-title tc-badge-12">Do 5 rokov → 1/12 základu</div>
+                            <table class="tc-table">
+                                <thead><tr><th>§</th><th>Trestný čin</th><th>Sadzba</th></tr></thead>
+                                <tbody>
+                                    <tr><td>§ 149</td><td>Usmrtenie</td><td>do 3 r.</td></tr>
+                                    <tr><td>§ 154</td><td>Účasť na samovražde</td><td>6 mes.–3 r.</td></tr>
+                                    <tr><td>§ 156</td><td>Ublíženie na zdraví (ľahká ujma, úmysel)</td><td>6 mes.–2 r.</td></tr>
+                                    <tr><td>§ 157</td><td>Ublíženie na zdraví z nedbanlivosti (ťažká)</td><td>6 mes.–2 r.</td></tr>
+                                    <tr><td>§ 171</td><td>Prechovávanie OL/PL – nepatrné množstvo konopy</td><td>do 1 r.</td></tr>
+                                    <tr><td>§ 171</td><td>Prechovávanie OL/PL – nepatrné množstvo (iná)</td><td>do 2 r.</td></tr>
+                                    <tr><td>§ 172</td><td>Neoprávnené pestovanie rastlín OL/PL (nepatrné mn.)</td><td>do 6 mes.</td></tr>
+                                    <tr><td>§ 173</td><td>Výroba a obchodovanie s OL/PL (zákl. skutk. podstata)</td><td>1–5 r.</td></tr>
+                                    <tr><td>§ 173a</td><td>Prechovávanie drogového prekurzora</td><td>do 3 r.</td></tr>
+                                    <tr><td>§ 174</td><td>Šírenie toxikománie</td><td>1–5 r.</td></tr>
+                                    <tr><td>§ 183</td><td>Obmedzovanie osobnej slobody</td><td>6 mes.–3 r.</td></tr>
+                                    <tr><td>§ 184</td><td>Obmedzovanie slobody pobytu</td><td>6 mes.–3 r.</td></tr>
+                                    <tr><td>§ 192</td><td>Nátlak</td><td>do 3 r.</td></tr>
+                                    <tr><td>§ 194</td><td>Porušovanie domovej slobody</td><td>do 2 r.</td></tr>
+                                    <tr><td>§ 207</td><td>Zanedbanie povinnej výživy</td><td>do 3 r.</td></tr>
+                                    <tr><td>§ 221</td><td>Podvod (malá škoda)</td><td>do 2 r.</td></tr>
+                                    <tr><td>§ 233</td><td>Legalizácia výnosu z TČ</td><td>do 4 r.</td></tr>
+                                    <tr><td>§ 247</td><td>Neoprávnený prístup do počítačového systému</td><td>do 2 r.</td></tr>
+                                    <tr><td>§ 360</td><td>Násilie voči skupine obyvateľov</td><td>do 3 r.</td></tr>
+                                    <tr><td>§ 373</td><td>Ohováranie</td><td>do 1 r.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="tc-group">
+                            <div class="tc-group-title tc-badge-8">5 až 10 rokov → 1/8 základu</div>
+                            <table class="tc-table">
+                                <thead><tr><th>§</th><th>Trestný čin</th><th>Sadzba</th></tr></thead>
+                                <tbody>
+                                    <tr><td>§ 146</td><td>Vražda novonarodeného dieťaťa matkou</td><td>4–8 r.</td></tr>
+                                    <tr><td>§ 147</td><td>Zabitie (úmysel + nedbanlivosť)</td><td>7–10 r.</td></tr>
+                                    <tr><td>§ 148</td><td>Zabitie (úmysel ubližiť, smrť z ned.)</td><td>3–8 r.</td></tr>
+                                    <tr><td>§ 155</td><td>Ublíženie na zdraví (ťažká ujma, úmysel)</td><td>4–10 r.</td></tr>
+                                    <tr><td>§ 173</td><td>Výroba a obchodovanie s OL/PL (ods. 2)</td><td>3–10 r.</td></tr>
+                                    <tr><td>§ 179</td><td>Obchodovanie s ľuďmi</td><td>4–10 r.</td></tr>
+                                    <tr><td>§ 182</td><td>Pozbavenie osobnej slobody</td><td>4–10 r.</td></tr>
+                                    <tr><td>§ 185</td><td>Branie rukojemníka</td><td>4–10 r.</td></tr>
+                                    <tr><td>§ 188</td><td>Lúpež</td><td>3–8 r.</td></tr>
+                                    <tr><td>§ 189</td><td>Vydieranie</td><td>2–6 r.</td></tr>
+                                    <tr><td>§ 199</td><td>Znásilnenie</td><td>5–10 r.</td></tr>
+                                    <tr><td>§ 200</td><td>Sexuálne násilie</td><td>5–10 r.</td></tr>
+                                    <tr><td>§ 201</td><td>Sexuálne zneužívanie (os. do 15 r.)</td><td>3–10 r.</td></tr>
+                                    <tr><td>§ 208</td><td>Týranie blízkej a zverenej osoby</td><td>3–8 r.</td></tr>
+                                    <tr><td>§ 221</td><td>Podvod (škoda veľkého rozsahu, ods. 4)</td><td>3–10 r.</td></tr>
+                                    <tr><td>§ 329</td><td>Prijímanie úplatku (zákl. skutk. podstata)</td><td>2–6 r.</td></tr>
+                                    <tr><td>§ 331</td><td>Podplácanie (zákl. skutk. podstata)</td><td>1–5 r.</td></tr>
+                                    <tr><td>§ 332</td><td>Nepriama korupcia</td><td>do 5 r.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="tc-group">
+                            <div class="tc-group-title tc-badge-6">Nad 10 rokov / výnimočný trest → 1/6 základu</div>
+                            <table class="tc-table">
+                                <thead><tr><th>§</th><th>Trestný čin</th><th>Sadzba</th></tr></thead>
+                                <tbody>
+                                    <tr><td>§ 144</td><td>Úkladná vražda</td><td>20–25 r.</td></tr>
+                                    <tr><td>§ 145</td><td>Vražda</td><td>15–20 r.</td></tr>
+                                    <tr><td>§ 173</td><td>Výroba a obch. s OL/PL – veľké mn. (ods. 4)</td><td>8–20 r. / doživotie</td></tr>
+                                    <tr><td>§ 179</td><td>Obchodovanie s ľuďmi (kvalif., ods. 4–5)</td><td>12–20 r.</td></tr>
+                                    <tr><td>§ 186</td><td>Vydieračský únos</td><td>7–12 r.</td></tr>
+                                    <tr><td>§ 187</td><td>Zavlečenie do cudziny (ods. 1)</td><td>4–10 r. → ods. 3: 12–25 r.</td></tr>
+                                    <tr><td>§ 297</td><td>Zločinecká skupina / terorizmus</td><td>12–20 r.</td></tr>
+                                    <tr><td>§ 313</td><td>Terorizmus</td><td>20–25 r. / doživotie</td></tr>
+                                    <tr><td>§ 418</td><td>Genocídium</td><td>doživotie</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="tc-group">
+                            <div class="tc-group-title tc-badge-24">Neverejné zasadnutie / Priestupky → 1/24 základu</div>
+                            <table class="tc-table">
+                                <thead><tr><th>Typ</th><th>Popis</th></tr></thead>
+                                <tbody>
+                                    <tr><td>§ 12 ods. 1</td><td>Obhajoba vo veciach, kde súd 1. stupňa rozhoduje na neverejnom zasadnutí (rozkaz na potrestanie, trestný rozkaz a pod.)</td></tr>
+                                    <tr><td>§ 12 ods. 2</td><td>Zastupovanie v konaní o priestupkoch</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
             </div>
 
             <!-- Úkony — spoločné -->
@@ -641,10 +808,12 @@ function basePerAct(cfg, mode, civilType, amountEur) {
     switch (mode) {
         case 'civil':
             if (civilType === 'monetary') return calcTariffMonetary(amountEur);
-            return cfg.base / 13;        // iné plnenie — 1/13 civilného základu
-        case 'criminal_5':    return cfg.baseCr / 10;   // do 5 rokov
-        case 'criminal_10':   return cfg.baseCr / 8;    // 5–10 rokov
-        case 'criminal_10_plus': return cfg.baseCr / 6; // nad 10 rokov / výnimočný trest
+            return cfg.base / 13;             // 1/13 civilného základu
+        case 'criminal_5':          return cfg.baseCr / 12;  // horná hranica ≤ 5 r. → 1/12
+        case 'criminal_10':         return cfg.baseCr / 8;   // 5–10 r. → 1/8
+        case 'criminal_10_plus':    return cfg.baseCr / 6;   // > 10 r. / výnimočný → 1/6
+        case 'criminal_neverejne':  return cfg.baseCr / 24;  // neverejné zasadnutie → 1/24
+        case 'criminal_priestupky': return cfg.baseCr / 24;  // priestupky → 1/24
         default: return cfg.base / 13;
     }
 }
@@ -668,6 +837,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
         });
         document.getElementById('panel-civil').style.display  = activeTab === 'civil'    ? '' : 'none';
         document.getElementById('panel-criminal').style.display = activeTab === 'criminal' ? '' : 'none';
+        document.getElementById('tc-reference').style.display  = activeTab === 'criminal' ? '' : 'none';
     });
 });
 
@@ -782,10 +952,12 @@ document.getElementById('calc-form').addEventListener('submit', e => {
     // Poznámka
     const modeLabel = {
         monetary: `peňažné plnenie ${fmt(amountEur)}`,
-        non_monetary: 'iné plnenie (základná sadzba 1/13)',
-        criminal_5: 'trestné konanie do 5 rokov (1/10 základu)',
-        criminal_10: 'trestné konanie 5–10 rokov (1/8 základu)',
-        criminal_10_plus: 'trestné konanie nad 10 rokov (1/6 základu)',
+        non_monetary: 'iné plnenie – 1/13 základu (§ 11 ods. 1)',
+        criminal_5: 'trestné konanie – horná hranica do 5 r. – 1/12 (§ 12 ods. 3a)',
+        criminal_10: 'trestné konanie – horná hranica 5–10 r. – 1/8 (§ 12 ods. 3b)',
+        criminal_10_plus: 'trestné konanie – nad 10 r. / výnimočný trest – 1/6 (§ 12 ods. 3c)',
+        criminal_neverejne: 'trestné konanie – neverejné zasadnutie – 1/24 (§ 12 ods. 1)',
+        criminal_priestupky: 'konanie o priestupkoch – 1/24 (§ 12 ods. 2)',
     };
     const usedBase = (mode.startsWith('criminal')) ? cfg.baseCr : cfg.base;
     document.getElementById('res-note').textContent =
