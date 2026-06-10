@@ -2,44 +2,94 @@
 <html lang="sk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0">
     <title>Kalkulačka trov právneho zastúpenia | Vyhláška 655/2004 Z. z.</title>
     <meta name="description" content="Bezplatná online kalkulačka trov právneho zastúpenia podľa vyhlášky MS SR č. 655/2004 Z. z. Civilné aj trestné konanie.">
+
+    <!-- PWA / inštalácia na mobil -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Trovy">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* ===== RESET & BASE ===== */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
+            color-scheme: light dark;
+            /* akcent */
             --blue: #2563eb;
             --blue-dark: #1d4ed8;
-            --blue-light: #eff6ff;
-            --blue-ring: rgba(37,99,235,.12);
+            --blue-2: #4f46e5;
+            --blue-light: rgba(37,99,235,.10);
+            --blue-ring: rgba(37,99,235,.28);
             --green: #16a34a;
             --green-light: #f0fdf4;
             --red: #dc2626;
-            --gray-50: #f8fafc;
-            --gray-100: #f1f5f9;
-            --gray-200: #e2e8f0;
+            /* povrchy a text (svetlý režim) */
+            --surface: #ffffff;
+            --surface-2: #f8fafc;
+            --gray-50: #f4f7fb;
+            --gray-100: #eef2f7;
+            --gray-200: #e3e9f2;
             --gray-400: #94a3b8;
             --gray-500: #64748b;
             --gray-700: #334155;
             --gray-900: #0f172a;
-            --radius: .875rem;
-            --radius-sm: .5rem;
-            --shadow: 0 4px 24px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.04);
-            --transition: .18s ease;
+            --page-bg: #eef2f9;
+            --radius: 1.15rem;
+            --radius-sm: .7rem;
+            --shadow: 0 12px 32px -14px rgba(15,23,42,.22), 0 3px 8px -4px rgba(15,23,42,.10);
+            --shadow-sm: 0 2px 8px -3px rgba(15,23,42,.14);
+            --transition: .2s cubic-bezier(.4,0,.2,1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --blue: #3b82f6;
+                --blue-dark: #2563eb;
+                --blue-2: #6366f1;
+                --blue-light: rgba(59,130,246,.16);
+                --blue-ring: rgba(59,130,246,.35);
+                --green-light: rgba(34,197,94,.14);
+                --surface: #151c2c;
+                --surface-2: #1b2434;
+                --gray-50: #1b2434;
+                --gray-100: #1f2a3d;
+                --gray-200: #2a364d;
+                --gray-400: #6b7a93;
+                --gray-500: #97a4ba;
+                --gray-700: #c5cedd;
+                --gray-900: #f1f5f9;
+                --page-bg: #0b1120;
+                --shadow: 0 14px 36px -16px rgba(0,0,0,.7), 0 3px 10px -4px rgba(0,0,0,.5);
+                --shadow-sm: 0 2px 8px -3px rgba(0,0,0,.5);
+            }
         }
 
         body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background: var(--gray-50);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background:
+                radial-gradient(900px 500px at 50% -8%, var(--blue-light), transparent 60%),
+                var(--page-bg);
             color: var(--gray-900);
             line-height: 1.6;
             min-height: 100vh;
-            padding: 2rem 1rem 4rem;
+            min-height: 100dvh;
+            padding:
+                calc(2rem + env(safe-area-inset-top)) calc(1rem + env(safe-area-inset-right))
+                calc(3rem + env(safe-area-inset-bottom)) calc(1rem + env(safe-area-inset-left));
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
         }
 
         /* ===== LAYOUT ===== */
@@ -51,7 +101,18 @@
         /* ===== HEADER ===== */
         .header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.75rem;
+        }
+        .header-logo {
+            width: 4rem;
+            height: 4rem;
+            margin: 0 auto 1rem;
+            border-radius: 1.25rem;
+            background: linear-gradient(135deg, var(--blue) 0%, var(--blue-2) 100%);
+            display: grid;
+            place-items: center;
+            font-size: 2rem;
+            box-shadow: 0 12px 28px -8px rgba(37,99,235,.55);
         }
         .header-badge {
             display: inline-flex;
@@ -59,18 +120,19 @@
             gap: .375rem;
             background: var(--blue-light);
             color: var(--blue);
-            font-size: .75rem;
+            font-size: .72rem;
             font-weight: 600;
-            letter-spacing: .04em;
+            letter-spacing: .05em;
             text-transform: uppercase;
-            padding: .3rem .75rem;
+            padding: .3rem .8rem;
             border-radius: 99px;
-            margin-bottom: 1rem;
+            margin-bottom: .9rem;
         }
         .header h1 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            line-height: 1.25;
+            font-size: 1.8rem;
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -.02em;
             color: var(--gray-900);
             margin-bottom: .5rem;
         }
@@ -79,22 +141,57 @@
             font-size: .9rem;
         }
 
+        /* ===== INSTALL PROMPT ===== */
+        .install-bar {
+            display: none;
+            align-items: center;
+            gap: .75rem;
+            background: var(--surface);
+            border: 1.5px solid var(--blue);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            padding: .85rem 1rem;
+            margin-bottom: 1.25rem;
+        }
+        .install-bar.show { display: flex; animation: slideUp .25s ease; }
+        .install-bar .ib-ico {
+            width: 2.5rem; height: 2.5rem; flex-shrink: 0;
+            border-radius: .7rem;
+            background: linear-gradient(135deg, var(--blue) 0%, var(--blue-2) 100%);
+            display: grid; place-items: center; font-size: 1.25rem;
+        }
+        .install-bar .ib-txt { flex: 1; font-size: .82rem; color: var(--gray-700); line-height: 1.35; }
+        .install-bar .ib-txt strong { color: var(--gray-900); font-weight: 600; }
+        .install-bar .ib-btn {
+            border: none; background: var(--blue); color: #fff;
+            font-family: inherit; font-weight: 600; font-size: .82rem;
+            padding: .55rem .9rem; border-radius: .6rem; cursor: pointer;
+            transition: background var(--transition); white-space: nowrap;
+        }
+        .install-bar .ib-btn:hover { background: var(--blue-dark); }
+        .install-bar .ib-close {
+            border: none; background: transparent; color: var(--gray-400);
+            font-size: 1.1rem; cursor: pointer; padding: .25rem; line-height: 1;
+        }
+
         /* ===== CARD ===== */
         .card {
-            background: #fff;
+            background: var(--surface);
+            border: 1px solid var(--border-soft, transparent);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
-            padding: 2rem;
+            padding: 1.75rem;
             margin-bottom: 1.5rem;
         }
         .card-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--gray-700);
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: -.01em;
+            color: var(--gray-900);
             margin-bottom: 1.25rem;
             display: flex;
             align-items: center;
-            gap: .5rem;
+            gap: .6rem;
         }
         .card-title .icon {
             width: 1.5rem;
@@ -129,9 +226,9 @@
             font-family: inherit;
         }
         .tab-btn.active {
-            background: #fff;
-            color: var(--gray-900);
-            box-shadow: 0 1px 3px rgba(0,0,0,.1);
+            background: var(--surface);
+            color: var(--blue);
+            box-shadow: var(--shadow-sm);
         }
         .tab-btn:hover:not(.active) {
             color: var(--gray-700);
@@ -164,13 +261,14 @@
 
         input[type="number"], select {
             width: 100%;
-            padding: .6875rem .875rem;
+            min-height: 3rem;
+            padding: .75rem .95rem;
             border: 1.5px solid var(--gray-200);
             border-radius: var(--radius-sm);
-            font-size: .9375rem;
+            font-size: 1rem;
             font-family: inherit;
             color: var(--gray-900);
-            background: #fff;
+            background: var(--surface);
             transition: border-color var(--transition), box-shadow var(--transition);
             appearance: none;
             -webkit-appearance: none;
@@ -278,21 +376,23 @@
         /* ===== BUTTON ===== */
         .btn-primary {
             width: 100%;
-            padding: .875rem;
-            background: var(--blue);
+            min-height: 3.25rem;
+            padding: .95rem;
+            background: linear-gradient(135deg, var(--blue) 0%, var(--blue-2) 100%);
             color: #fff;
             border: none;
             border-radius: var(--radius-sm);
-            font-size: 1rem;
-            font-weight: 600;
+            font-size: 1.02rem;
+            font-weight: 700;
             cursor: pointer;
             font-family: inherit;
-            transition: background var(--transition), transform var(--transition);
-            margin-top: .25rem;
+            transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
+            margin-top: .5rem;
             letter-spacing: .01em;
+            box-shadow: 0 10px 24px -10px rgba(37,99,235,.6);
         }
-        .btn-primary:hover { background: var(--blue-dark); }
-        .btn-primary:active { transform: scale(.98); }
+        .btn-primary:hover { filter: brightness(1.05); box-shadow: 0 14px 28px -10px rgba(37,99,235,.7); }
+        .btn-primary:active { transform: scale(.985); }
 
         .btn-secondary {
             width: 100%;
@@ -311,29 +411,39 @@
 
         /* ===== RESULT ===== */
         .result-card {
-            background: #fff;
+            background: var(--surface);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             overflow: hidden;
             display: none;
         }
-        .result-card.visible { display: block; animation: slideUp .25s ease; }
+        .result-card.visible { display: block; animation: slideUp .3s cubic-bezier(.4,0,.2,1); }
 
         .result-header {
-            background: linear-gradient(135deg, var(--blue) 0%, #3b82f6 100%);
-            padding: 1.5rem 2rem;
+            position: relative;
+            background: linear-gradient(135deg, var(--blue) 0%, var(--blue-2) 100%);
+            padding: 1.6rem 1.75rem;
             color: #fff;
+            overflow: hidden;
+        }
+        .result-header::after {
+            content: '⚖';
+            position: absolute;
+            right: -.5rem; bottom: -1.5rem;
+            font-size: 6rem; opacity: .12; line-height: 1;
         }
         .result-header h2 {
-            font-size: 1rem;
+            font-size: .92rem;
             font-weight: 500;
-            opacity: .85;
-            margin-bottom: .25rem;
+            opacity: .9;
+            margin-bottom: .3rem;
+            position: relative;
         }
         .result-total {
-            font-size: 2.25rem;
-            font-weight: 700;
-            letter-spacing: -.02em;
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: -.03em;
+            position: relative;
         }
 
         .result-body {
@@ -428,13 +538,30 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
-            body { padding: 1rem .75rem 3rem; }
-            .card { padding: 1.5rem; }
-            .header h1 { font-size: 1.4rem; }
+            body {
+                padding:
+                    calc(1.25rem + env(safe-area-inset-top)) calc(.85rem + env(safe-area-inset-right))
+                    calc(2.5rem + env(safe-area-inset-bottom)) calc(.85rem + env(safe-area-inset-left));
+            }
+            .card { padding: 1.35rem; }
+            .header { margin-bottom: 1.5rem; }
+            .header h1 { font-size: 1.5rem; }
+            .header-logo { width: 3.5rem; height: 3.5rem; font-size: 1.75rem; }
             .form-grid { grid-template-columns: 1fr; }
-            .result-total { font-size: 1.75rem; }
+            .result-total { font-size: 2.1rem; }
             .btn-row { flex-direction: column; }
-            .result-header, .result-body { padding: 1.25rem 1.5rem; }
+            .result-header, .result-body { padding: 1.35rem 1.4rem; }
+        }
+
+        /* ===== STANDALONE (nainštalovaná appka) ===== */
+        @media (display-mode: standalone) {
+            body { padding-top: calc(1.5rem + env(safe-area-inset-top)); }
+            footer { opacity: .7; }
+        }
+
+        /* jemné okraje kariet v tmavom režime */
+        @media (prefers-color-scheme: dark) {
+            .card, .result-card { border: 1px solid var(--gray-200); }
         }
 
         /* ===== TČ REFERENČNÁ TABUĽKA ===== */
@@ -522,10 +649,19 @@
 
     <!-- Header -->
     <header class="header">
-        <div class="header-badge">⚖️ Advokátske trovy</div>
+        <div class="header-logo">⚖️</div>
+        <div class="header-badge">Advokátske trovy</div>
         <h1>Kalkulačka trov právneho zastúpenia</h1>
         <p>Výpočet podľa vyhlášky MS SR č. 655/2004 Z. z.</p>
     </header>
+
+    <!-- Inštalačná lišta (zobrazí sa keď je možná inštalácia) -->
+    <div class="install-bar" id="install-bar">
+        <div class="ib-ico">📲</div>
+        <div class="ib-txt"><strong>Nainštalovať aplikáciu</strong><br>Pridajte si kalkulačku na plochu telefónu.</div>
+        <button class="ib-btn" id="install-btn">Inštalovať</button>
+        <button class="ib-close" id="install-close" aria-label="Zavrieť">✕</button>
+    </div>
 
     <!-- Main form card -->
     <div class="card">
@@ -991,6 +1127,59 @@ document.getElementById('btn-copy').addEventListener('click', function () {
         setTimeout(() => { this.textContent = '📋 Kopírovať súhrn'; }, 2000);
     });
 });
+
+/* ====================================================
+   PWA — service worker + inštalácia na mobil
+   ==================================================== */
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+}
+
+const installBar   = document.getElementById('install-bar');
+const installBtn   = document.getElementById('install-btn');
+const installClose = document.getElementById('install-close');
+let deferredPrompt = null;
+
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true;
+const dismissed = localStorage.getItem('installDismissed') === '1';
+
+// Android / Chrome / Edge – natívna výzva
+window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (!isStandalone && !dismissed) installBar.classList.add('show');
+});
+
+installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        installBar.classList.remove('show');
+    }
+});
+
+installClose.addEventListener('click', () => {
+    installBar.classList.remove('show');
+    localStorage.setItem('installDismissed', '1');
+});
+
+window.addEventListener('appinstalled', () => {
+    installBar.classList.remove('show');
+});
+
+// iOS / iPadOS Safari – nepodporuje beforeinstallprompt, zobraz návod
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+if (isIOS && !isStandalone && !dismissed) {
+    installBar.querySelector('.ib-txt').innerHTML =
+        '<strong>Nainštalovať aplikáciu</strong><br>Ťuknite na <span style="white-space:nowrap">Zdieľať ⬆️</span> → „Pridať na plochu".';
+    installBtn.style.display = 'none';
+    installBar.classList.add('show');
+}
 </script>
 </body>
 </html>
