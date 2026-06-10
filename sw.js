@@ -1,5 +1,5 @@
 /* Service worker – offline cache pre Kalkulačku trov */
-const CACHE = 'trovy-v2';
+const CACHE = 'trovy-v3';
 const ASSETS = [
   './',
   './index.html',

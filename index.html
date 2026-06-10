@@ -8,8 +8,15 @@
 
     <!-- PWA / inštalácia na mobil -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2563eb" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" id="meta-theme" content="#eef2f9">
+    <script>
+    // aplikuj uloženú tému ešte pred vykreslením (žiadne bliknutie)
+    (function(){try{
+        var m = localStorage.getItem('theme') || 'auto';
+        var d = m === 'dark' || (m === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = d ? 'dark' : 'light';
+    }catch(e){}})();
+    </script>
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -53,28 +60,28 @@
             --transition: .2s cubic-bezier(.4,0,.2,1);
         }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --blue: #3b82f6;
-                --blue-dark: #2563eb;
-                --blue-2: #6366f1;
-                --blue-light: rgba(59,130,246,.16);
-                --blue-ring: rgba(59,130,246,.35);
-                --green-light: rgba(34,197,94,.14);
-                --surface: #151c2c;
-                --surface-2: #1b2434;
-                --gray-50: #1b2434;
-                --gray-100: #1f2a3d;
-                --gray-200: #2a364d;
-                --gray-400: #6b7a93;
-                --gray-500: #97a4ba;
-                --gray-700: #c5cedd;
-                --gray-900: #f1f5f9;
-                --page-bg: #0b1120;
-                --shadow: 0 14px 36px -16px rgba(0,0,0,.7), 0 3px 10px -4px rgba(0,0,0,.5);
-                --shadow-sm: 0 2px 8px -3px rgba(0,0,0,.5);
-            }
+        :root[data-theme="dark"] {
+            color-scheme: dark;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --blue-2: #6366f1;
+            --blue-light: rgba(59,130,246,.16);
+            --blue-ring: rgba(59,130,246,.35);
+            --green-light: rgba(34,197,94,.14);
+            --surface: #151c2c;
+            --surface-2: #1b2434;
+            --gray-50: #1b2434;
+            --gray-100: #1f2a3d;
+            --gray-200: #2a364d;
+            --gray-400: #6b7a93;
+            --gray-500: #97a4ba;
+            --gray-700: #c5cedd;
+            --gray-900: #f1f5f9;
+            --page-bg: #0b1120;
+            --shadow: 0 14px 36px -16px rgba(0,0,0,.7), 0 3px 10px -4px rgba(0,0,0,.5);
+            --shadow-sm: 0 2px 8px -3px rgba(0,0,0,.5);
         }
+        :root[data-theme="light"] { color-scheme: light; }
 
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -560,8 +567,69 @@
         }
 
         /* jemné okraje kariet v tmavom režime */
-        @media (prefers-color-scheme: dark) {
-            .card, .result-card { border: 1px solid var(--gray-200); }
+        :root[data-theme="dark"] .card,
+        :root[data-theme="dark"] .result-card { border: 1px solid var(--gray-200); }
+
+        /* ===== PREPÍNAČ TÉMY ===== */
+        .theme-toggle {
+            position: fixed;
+            top: calc(.9rem + env(safe-area-inset-top));
+            right: calc(.9rem + env(safe-area-inset-right));
+            z-index: 60;
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 50%;
+            border: 1px solid var(--gray-200);
+            background: var(--surface);
+            box-shadow: var(--shadow-sm);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: transform var(--transition), box-shadow var(--transition);
+            font-family: inherit;
+        }
+        .theme-toggle:hover { box-shadow: var(--shadow); }
+        .theme-toggle:active { transform: scale(.9); }
+
+        /* ===== HISTÓRIA VÝPOČTOV ===== */
+        .history-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: .5rem;
+        }
+        .history-head .card-title { margin-bottom: 0; }
+        .btn-text {
+            border: none;
+            background: none;
+            color: var(--gray-400);
+            font-family: inherit;
+            font-size: .78rem;
+            font-weight: 500;
+            cursor: pointer;
+            padding: .35rem .5rem;
+            border-radius: .5rem;
+            transition: color var(--transition), background var(--transition);
+        }
+        .btn-text:hover { color: var(--red); background: var(--gray-100); }
+        .history-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .75rem;
+            padding: .7rem .15rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .history-item:last-child { border-bottom: none; }
+        .history-item .h-note { font-size: .83rem; color: var(--gray-700); line-height: 1.35; }
+        .history-item .h-meta { font-size: .72rem; color: var(--gray-400); margin-top: .1rem; }
+        .history-item .h-total {
+            font-weight: 700;
+            font-size: .95rem;
+            color: var(--blue);
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
         }
 
         /* ===== TČ REFERENČNÁ TABUĽKA ===== */
@@ -646,6 +714,9 @@
 </head>
 <body>
 <div class="page">
+
+    <!-- Prepínač témy -->
+    <button class="theme-toggle" id="theme-toggle" title="Prepnúť režim" aria-label="Prepnúť svetlý/tmavý režim">🌓</button>
 
     <!-- Header -->
     <header class="header">
@@ -828,17 +899,8 @@
 
             <!-- Úkony — spoločné -->
             <div class="form-group">
-                <label>Úkony právnej služby</label>
-                <div class="acts-list" id="acts-list">
-                    <div class="act-item">
-                        <select class="act-type-select">
-                            <option value="full">Celý úkon (1×)</option>
-                            <option value="half">Polovičný úkon (0,5×)</option>
-                            <option value="third">Tretinový úkon (1/3×)</option>
-                        </select>
-                        <button type="button" class="btn-icon danger remove-act" title="Odstrániť úkon">✕</button>
-                    </div>
-                </div>
+                <label>Úkony právnej služby <span class="label-hint">(koeficient podľa § 13a / § 14)</span></label>
+                <div class="acts-list" id="acts-list"></div>
                 <button type="button" class="btn-add-act" id="add-act-btn">
                     ＋ Pridať úkon
                 </button>
@@ -896,8 +958,18 @@
         </div>
         <div class="btn-row">
             <button class="btn-secondary" onclick="window.print()">🖨 Tlačiť</button>
-            <button class="btn-secondary" id="btn-copy">📋 Kopírovať súhrn</button>
+            <button class="btn-secondary" id="btn-copy">📋 Kopírovať</button>
+            <button class="btn-secondary" id="btn-share">📤 Zdieľať</button>
         </div>
+    </div>
+
+    <!-- História výpočtov -->
+    <div class="card" id="history-card" style="display:none">
+        <div class="history-head">
+            <div class="card-title"><span class="icon">🕘</span> História výpočtov</div>
+            <button type="button" class="btn-text" id="history-clear">Vymazať</button>
+        </div>
+        <div id="history-list"></div>
     </div>
 
     <footer>
@@ -940,11 +1012,10 @@ function calcTariffMonetary(amountEur) {
 /* ====================================================
    VÝPOČET ZÁKLADNEJ TARIFNEJ ODMENY ZA ÚKON
    ==================================================== */
-function basePerAct(cfg, mode, civilType, amountEur) {
+function basePerAct(cfg, mode, amountEur) {
     switch (mode) {
-        case 'civil':
-            if (civilType === 'monetary') return calcTariffMonetary(amountEur);
-            return cfg.base / 13;             // 1/13 civilného základu
+        case 'monetary':            return calcTariffMonetary(amountEur); // § 10
+        case 'non_monetary':        return cfg.base / 13;    // § 11 ods. 1
         case 'criminal_5':          return cfg.baseCr / 12;  // horná hranica ≤ 5 r. → 1/12
         case 'criminal_10':         return cfg.baseCr / 8;   // 5–10 r. → 1/8
         case 'criminal_10_plus':    return cfg.baseCr / 6;   // > 10 r. / výnimočný → 1/6
@@ -985,19 +1056,51 @@ document.getElementById('civil-type').addEventListener('change', function () {
 });
 
 /* ====================================================
-   SPRÁVA ÚKONOV
+   SPRÁVA ÚKONOV — pomenované úkony podľa § 13a a § 14
    ==================================================== */
 const actsList = document.getElementById('acts-list');
+
+// koeficienty podielu zo základnej sadzby
+const COEF = { '1': 1, '2/3': 2/3, '1/2': 0.5, '1/3': 1/3, '1/4': 0.25 };
+
+const ACT_OPTIONS_HTML = `
+    <optgroup label="Všeobecné">
+        <option value="1" data-name="Celý úkon">Celý úkon (1×)</option>
+        <option value="2/3" data-name="Úkon 2/3">Dve tretiny úkonu (2/3)</option>
+        <option value="1/2" data-name="Polovičný úkon">Polovičný úkon (1/2)</option>
+        <option value="1/3" data-name="Tretinový úkon">Tretinový úkon (1/3)</option>
+        <option value="1/4" data-name="Štvrtinový úkon">Štvrtinový úkon (1/4)</option>
+    </optgroup>
+    <optgroup label="Civilné konanie – § 13a">
+        <option value="1" data-name="Prevzatie a príprava zastúpenia">Prevzatie a príprava zastúpenia (1×)</option>
+        <option value="1" data-name="Písomné podanie vo veci samej">Písomné podanie vo veci samej (1×)</option>
+        <option value="1" data-name="Účasť na pojednávaní">Účasť na pojednávaní – každé 2 hod. (1×)</option>
+        <option value="1" data-name="Porada s klientom (hodina)">Porada s klientom – skončená hodina (1×)</option>
+        <option value="1" data-name="Právny rozbor veci">Vypracovanie právneho rozboru veci (1×)</option>
+        <option value="1" data-name="Odvolanie/dovolanie vo veci samej">Odvolanie / dovolanie vo veci samej (1×)</option>
+        <option value="1/2" data-name="Návrh na predbežné opatrenie po začatí">Návrh na predbežné opatrenie po začatí (1/2)</option>
+        <option value="1/2" data-name="Odvolanie proti procesnému rozhodnutiu">Odvolanie – nie vo veci samej (1/2)</option>
+        <option value="1/2" data-name="Krátka porada s klientom">Porada s klientom kratšia ako hodina (1/2)</option>
+        <option value="1/2" data-name="Pojednávanie – vyhlásenie rozhodnutia">Pojednávanie – len vyhlásenie rozhodnutia (1/2)</option>
+        <option value="1/4" data-name="Pojednávanie odročené bez prejednania">Pojednávanie odročené bez prejednania (1/4)</option>
+    </optgroup>
+    <optgroup label="Trestné konanie – § 14">
+        <option value="1" data-name="Prevzatie a príprava obhajoby">Prevzatie a príprava obhajoby (1×)</option>
+        <option value="1" data-name="Písomné podanie vo veci samej">Písomné podanie vo veci samej (1×)</option>
+        <option value="1" data-name="Účasť pri vyšetrovacom úkone / na konaní">Vyšetrovací úkon, naštudovanie spisu, hl. pojednávanie (1×)</option>
+        <option value="2/3" data-name="Porada s klientom (hodina)">Porada s klientom – skončená hodina (2/3)</option>
+        <option value="2/3" data-name="Rokovanie s protistranou (hodina)">Rokovanie s protistranou – skončená hodina (2/3)</option>
+        <option value="1/2" data-name="Návrh na zabezpečenie dôkazu">Návrh na zabezpečenie dôkazu (1/2)</option>
+        <option value="1/2" data-name="Účasť na verejnom zasadnutí">Verejné zasadnutie – nie odvolanie/obnova (1/2)</option>
+        <option value="1/3" data-name="Krátka porada s klientom">Porada s klientom kratšia ako hodina (1/3)</option>
+        <option value="1/4" data-name="Pojednávanie – vyhlásenie rozhodnutia">Pojednávanie – len vyhlásenie rozhodnutia (1/4)</option>
+    </optgroup>`;
 
 function addActRow() {
     const div = document.createElement('div');
     div.className = 'act-item';
     div.innerHTML = `
-        <select class="act-type-select">
-            <option value="full">Celý úkon (1×)</option>
-            <option value="half">Polovičný úkon (0,5×)</option>
-            <option value="third">Tretinový úkon (1/3×)</option>
-        </select>
+        <select class="act-type-select">${ACT_OPTIONS_HTML}</select>
         <button type="button" class="btn-icon danger remove-act" title="Odstrániť úkon">✕</button>`;
     actsList.appendChild(div);
     updateRemoveButtons();
@@ -1012,7 +1115,7 @@ function updateRemoveButtons() {
 }
 
 document.getElementById('add-act-btn').addEventListener('click', addActRow);
-updateRemoveButtons();
+addActRow(); // prvý úkon pri štarte
 
 /* ====================================================
    VÝPOČET
@@ -1038,24 +1141,23 @@ document.getElementById('calc-form').addEventListener('submit', e => {
         mode = criminalType; // 'criminal_5' | 'criminal_10' | 'criminal_10_plus'
     }
 
-    // Koeficienty úkonov
-    const ACT_COEF = { full: 1, half: 0.5, third: 1/3 };
-    const ACT_NAME = { full: 'Celý úkon', half: 'Polovičný úkon', third: 'Tretinový úkon' };
-
+    // Úkony: koeficient z hodnoty option, názov z data-name
     const acts = Array.from(actsList.querySelectorAll('.act-type-select'))
-        .map(s => s.value);
+        .map(s => ({
+            coef: COEF[s.value] ?? 1,
+            name: s.selectedOptions[0].dataset.name || s.selectedOptions[0].textContent.trim()
+        }));
 
-    const baseOdmena = r2(basePerAct(cfg, mode, civilType, amountEur));
+    const baseOdmena = r2(basePerAct(cfg, mode, amountEur));
     let totalTariff = 0, totalOverhead = 0;
     const rows = [];
 
-    acts.forEach((type, idx) => {
-        const coef    = ACT_COEF[type];
-        const odmena  = r2(baseOdmena * coef);
-        const pausal  = r2(cfg.overhead * coef);
+    acts.forEach((act, idx) => {
+        const odmena  = r2(baseOdmena * act.coef);
+        const pausal  = r2(cfg.overhead);  // § 16 ods. 3: plný paušál za každý úkon
         totalTariff  += odmena;
         totalOverhead += pausal;
-        rows.push({ idx: idx + 1, name: ACT_NAME[type], odmena, pausal });
+        rows.push({ idx: idx + 1, name: act.name, odmena, pausal });
     });
 
     let vatAmount = 0;
@@ -1099,6 +1201,10 @@ document.getElementById('calc-form').addEventListener('submit', e => {
     document.getElementById('res-note').textContent =
         `Rok: ${yearKey} | Výpočtový základ: ${fmt(usedBase)} | Počet úkonov: ${acts.length} | Typ: ${modeLabel[mode]}`;
 
+    // Uložiť do histórie
+    const histNote = `${isCivil ? 'Civilné' : 'Trestné'} · ${acts.length} ${acts.length === 1 ? 'úkon' : acts.length < 5 ? 'úkony' : 'úkonov'} · rok ${yearKey}${isVat ? ' · s DPH' : ''}`;
+    saveHistoryEntry(fmt(total), histNote);
+
     // Zobraziť kartu
     const card = document.getElementById('result-card');
     card.classList.add('visible');
@@ -1106,9 +1212,9 @@ document.getElementById('calc-form').addEventListener('submit', e => {
 });
 
 /* ====================================================
-   KOPÍROVAŤ SÚHRN
+   SÚHRN — kopírovanie a zdieľanie
    ==================================================== */
-document.getElementById('btn-copy').addEventListener('click', function () {
+function buildSummary() {
     const total    = document.getElementById('res-total').textContent;
     const tariff   = document.getElementById('res-tariff').textContent;
     const overhead = document.getElementById('res-overhead').textContent;
@@ -1117,16 +1223,98 @@ document.getElementById('btn-copy').addEventListener('click', function () {
     const vatLine  = vatRow.style.display !== 'none'
         ? `\n${document.getElementById('res-vat-label').textContent}: ${document.getElementById('res-vat').textContent}`
         : '';
+    const actLines = Array.from(document.querySelectorAll('#acts-tbody tr'))
+        .map(tr => {
+            const c = tr.cells;
+            return `  ${c[0].textContent}. ${c[1].textContent} – ${c[2].textContent} + paušál ${c[3].textContent}`;
+        }).join('\n');
 
-    const text = `Kalkulačka trov právneho zastúpenia\n${'='.repeat(40)}\n`
-        + `Tarifná odmena: ${tariff}\nRežijný paušál: ${overhead}${vatLine}\n${'─'.repeat(40)}\n`
+    return `Trovy právneho zastúpenia (vyhl. 655/2004 Z. z.)\n${'='.repeat(44)}\n`
+        + (actLines ? `Úkony:\n${actLines}\n${'─'.repeat(44)}\n` : '')
+        + `Tarifná odmena: ${tariff}\nRežijný paušál: ${overhead}${vatLine}\n${'─'.repeat(44)}\n`
         + `SPOLU: ${total}\n\n${note}`;
+}
 
-    navigator.clipboard.writeText(text).then(() => {
+document.getElementById('btn-copy').addEventListener('click', function () {
+    navigator.clipboard.writeText(buildSummary()).then(() => {
         this.textContent = '✓ Skopírované';
-        setTimeout(() => { this.textContent = '📋 Kopírovať súhrn'; }, 2000);
+        setTimeout(() => { this.textContent = '📋 Kopírovať'; }, 2000);
     });
 });
+
+document.getElementById('btn-share').addEventListener('click', async function () {
+    const text = buildSummary();
+    if (navigator.share) {
+        try { await navigator.share({ title: 'Trovy právneho zastúpenia', text }); } catch (e) { /* zrušené */ }
+    } else {
+        navigator.clipboard.writeText(text);
+        this.textContent = '✓ Skopírované';
+        setTimeout(() => { this.textContent = '📤 Zdieľať'; }, 2000);
+    }
+});
+
+/* ====================================================
+   HISTÓRIA VÝPOČTOV (localStorage)
+   ==================================================== */
+const HKEY = 'trovyHistory';
+
+function loadHistory() {
+    try { return JSON.parse(localStorage.getItem(HKEY)) || []; } catch (e) { return []; }
+}
+
+function saveHistoryEntry(total, note) {
+    const h = loadHistory();
+    h.unshift({ t: Date.now(), total, note });
+    try { localStorage.setItem(HKEY, JSON.stringify(h.slice(0, 15))); } catch (e) {}
+    renderHistory();
+}
+
+function renderHistory() {
+    const h = loadHistory();
+    document.getElementById('history-card').style.display = h.length ? '' : 'none';
+    document.getElementById('history-list').innerHTML = h.map(e => {
+        const d = new Date(e.t);
+        const ds = d.toLocaleDateString('sk-SK') + ' ' +
+                   d.toLocaleTimeString('sk-SK', { hour: '2-digit', minute: '2-digit' });
+        return `<div class="history-item">
+            <div><div class="h-note">${e.note}</div><div class="h-meta">${ds}</div></div>
+            <div class="h-total">${e.total}</div>
+        </div>`;
+    }).join('');
+}
+
+document.getElementById('history-clear').addEventListener('click', () => {
+    localStorage.removeItem(HKEY);
+    renderHistory();
+});
+renderHistory();
+
+/* ====================================================
+   PREPÍNAČ TÉMY — auto / svetlý / tmavý
+   ==================================================== */
+const themeBtn  = document.getElementById('theme-toggle');
+const themeMeta = document.getElementById('meta-theme');
+const THEME_ICON  = { auto: '🌓', light: '☀️', dark: '🌙' };
+const THEME_LABEL = { auto: 'automatický (podľa systému)', light: 'svetlý', dark: 'tmavý' };
+let themeMode = localStorage.getItem('theme') || 'auto';
+
+function applyTheme() {
+    const sysDark = matchMedia('(prefers-color-scheme: dark)').matches;
+    const dark = themeMode === 'dark' || (themeMode === 'auto' && sysDark);
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    themeMeta.setAttribute('content', dark ? '#0b1120' : '#eef2f9');
+    themeBtn.textContent = THEME_ICON[themeMode];
+    themeBtn.title = 'Režim: ' + THEME_LABEL[themeMode];
+}
+
+themeBtn.addEventListener('click', () => {
+    themeMode = themeMode === 'auto' ? 'light' : themeMode === 'light' ? 'dark' : 'auto';
+    localStorage.setItem('theme', themeMode);
+    applyTheme();
+});
+
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+applyTheme();
 
 /* ====================================================
    PWA — service worker + inštalácia na mobil
